@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Nested duplicate project and generated files
+/bin/
