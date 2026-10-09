@@ -1,0 +1,210 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinook Album API</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #eef2ff, #f8fafc);
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 24px 8%;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        header p {
+            margin: 8px 0 0;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 24px;
+        }
+
+        .hero {
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            text-align: center;
+        }
+
+        .hero h2 {
+            color: #172554;
+            font-size: 2rem;
+            margin-top: 0;
+        }
+
+        .hero p {
+            color: #475569;
+            line-height: 1.7;
+            max-width: 650px;
+            margin: 0 auto 24px;
+        }
+
+        .button {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s ease;
+        }
+
+        .button:hover {
+            background: #1d4ed8;
+        }
+
+        .section-title {
+            margin: 36px 0 18px;
+            color: #172554;
+        }
+
+        .operations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .operation {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .get {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .post {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .put {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .delete {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .operation h3 {
+            margin: 4px 0 8px;
+        }
+
+        .operation p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 28px 16px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Chinook Album API</h1>
+        <p>Album management powered by Spring Boot and PostgreSQL</p>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Welcome to the Album API</h2>
+            <p>
+                This REST API provides endpoints to create, retrieve, update,
+                and delete albums in the Chinook database. Explore the available
+                endpoints and their request formats using the interactive API
+                documentation.
+            </p>
+            <a class="button" href="/swagger-ui.html">
+                View API Documentation
+            </a>
+        </section>
+
+        <h2 class="section-title">Available Operations</h2>
+
+        <section class="operations">
+            <article class="operation">
+                <span class="method get">GET</span>
+                <h3>Retrieve All Albums</h3>
+                <p>View the album collection at <code>/api/albums</code>.</p>
+            </article>
+
+            <article class="operation">
+                <span class="method get">GET</span>
+                <h3>Retrieve One Album</h3>
+                <p>Find an album by ID at <code>/api/albums/{id}</code>.</p>
+            </article>
+
+            <article class="operation">
+                <span class="method post">POST</span>
+                <h3>Create an Album</h3>
+                <p>Add an album using <code>/api/albums</code>.</p>
+            </article>
+
+            <article class="operation">
+                <span class="method put">PUT</span>
+                <h3>Update an Album</h3>
+                <p>Update an existing album at <code>/api/albums/{id}</code>.</p>
+            </article>
+
+            <article class="operation">
+                <span class="method delete">DELETE</span>
+                <h3>Delete an Album</h3>
+                <p>Remove an album at <code>/api/albums/{id}</code>.</p>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        CST-339 Lab 2 · Spring Boot · Spring Data JPA · PostgreSQL
+    </footer>
+</body>
+</html>
+```
