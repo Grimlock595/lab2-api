@@ -34,3 +34,6 @@ build/
 
 # Nested duplicate project and generated files
 /bin/
+
+# macOS generated files
+.DS_Store
