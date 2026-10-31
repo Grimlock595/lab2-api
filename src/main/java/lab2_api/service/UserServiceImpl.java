@@ -36,4 +36,31 @@ public class UserServiceImpl implements UserService {
     public User save(User user) {
         return userRepository.save(user);
     }
+
+	
+@Override
+public boolean changePassword(Long userId, String currentPassword, String newPassword) {
+    Optional<User> userOptional = userRepository.findById(userId);
+
+    if (userOptional.isEmpty()) {
+        return false;
+    }
+
+    User user = userOptional.get();
+
+    if (!user.getPassword().equals(currentPassword)) {
+        return false;
+    }
+
+    if (newPassword == null || newPassword.isBlank()) {
+        return false;
+    }
+
+    user.setPassword(newPassword);
+    user.setPasswordChangeRequired(false);
+    userRepository.save(user);
+
+    return true;
+}
+
 }
