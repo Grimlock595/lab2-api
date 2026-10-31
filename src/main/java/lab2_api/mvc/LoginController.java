@@ -54,11 +54,17 @@ public class LoginController {
             return "login";
         }
 
-        session.setAttribute("userId", user.getUserId());
-        session.setAttribute("username", user.getUsername());
-        session.setAttribute("role", user.getRole());
+        
+session.setAttribute("userId", user.getUserId());
+session.setAttribute("username", user.getUsername());
+session.setAttribute("role", user.getRole());
 
-        return "redirect:/";
+if (user.isPasswordChangeRequired()) {
+    return "redirect:/change-password";
+}
+
+return "redirect:/";
+
     }
 
     @GetMapping("/logout")
