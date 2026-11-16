@@ -71,6 +71,10 @@
                          th:text="${error}">
                     </div>
 
+                    <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                        Invalid username or password.
+                    </div>
+
                     <form th:action="@{/login}"
                           th:object="${login}"
                           method="post">
