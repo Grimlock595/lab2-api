@@ -1,9 +1,6 @@
 
 package lab2_api.mvc;
 
-import jakarta.servlet.http.HttpSession;
-import lab2_api.entity.User;
-import lab2_api.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Optional;
+import lab2_api.service.UserService;
 
 @Controller
 public class AdminController {
@@ -22,114 +19,50 @@ public class AdminController {
         this.userService = userService;
     }
 
-    private boolean isAdmin(HttpSession session) {
-        return "ADMIN".equals(session.getAttribute("role"));
-    }
-
     @GetMapping("/admin/users")
-    public String listUsers(Model model, HttpSession session) {
-        if (!isAdmin(session)) {
-            return "redirect:/login";
-        }
-
+    public String listUsers(Model model) {
         model.addAttribute("users", userService.findAll());
         return "admin/users";
     }
 
+    // Enable or disable a user.
     @PostMapping("/admin/users/{id}/toggle")
-    public String toggleUser(
-            @PathVariable Long id,
-            HttpSession session) {
+    public String toggleUser(@PathVariable Long id) {
 
-        if (!isAdmin(session)) {
-            return "redirect:/login";
-        }
-
-        Optional<User> userOptional = userService.findById(id);
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            // Prevent disabling the last enabled administrator.
-            if ("ADMIN".equals(user.getRole()) && user.isEnabled()) {
-                long enabledAdmins = userService.findAll().stream()
-                        .filter(u -> "ADMIN".equals(u.getRole()) && u.isEnabled())
-                        .count();
-
-                if (enabledAdmins <= 1) {
-                    return "redirect:/admin/users?lastAdmin";
-                }
-            }
-
-            user.setEnabled(!user.isEnabled());
-            userService.save(user);
+        try {
+            userService.toggleUserEnabled(id);
+        } catch (IllegalStateException e) {
+            return "redirect:/admin/users?lastAdmin";
+        } catch (IllegalArgumentException e) {
+            return "redirect:/admin/users?error";
         }
 
         return "redirect:/admin/users";
     }
 
+    // Change a user's role.
     @PostMapping("/admin/users/{id}/role")
     public String changeRole(
             @PathVariable Long id,
-            @RequestParam String role,
-            HttpSession session) {
+            @RequestParam String role) {
 
-        if (!isAdmin(session)) {
-            return "redirect:/login";
-        }
-
-        // Only the two permitted roles are accepted.
-        if (!"ADMIN".equals(role) && !"USER".equals(role)) {
+        try {
+            userService.changeUserRole(id, role);
+        } catch (IllegalStateException e) {
+            return "redirect:/admin/users?lastAdmin";
+        } catch (IllegalArgumentException e) {
             return "redirect:/admin/users?invalidRole";
-        }
-
-        Optional<User> userOptional = userService.findById(id);
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            // Prevent demoting the last enabled administrator.
-            if ("ADMIN".equals(user.getRole())
-                    && user.isEnabled()
-                    && "USER".equals(role)) {
-
-                long enabledAdmins = userService.findAll().stream()
-                        .filter(u -> "ADMIN".equals(u.getRole()) && u.isEnabled())
-                        .count();
-
-                if (enabledAdmins <= 1) {
-                    return "redirect:/admin/users?lastAdmin";
-                }
-            }
-
-            user.setRole(role);
-            userService.save(user);
         }
 
         return "redirect:/admin/users";
     }
 
+    // Reset a user's password.
     @PostMapping("/admin/users/{id}/reset-password")
-    public String resetPassword(
-            @PathVariable Long id,
-            HttpSession session) {
+    public String resetPassword(@PathVariable Long id) {
 
-        if (!isAdmin(session)) {
-            return "redirect:/login";
-        }
-
-        Optional<User> userOptional = userService.findById(id);
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            // Temporary Lab 4 password; replaced by BCrypt in Lab 5.
-            user.setPassword("password");
-            user.setPasswordChangeRequired(true);
-            userService.save(user);
-        }
+        userService.resetPassword(id);
 
         return "redirect:/admin/users";
     }
 }
-
