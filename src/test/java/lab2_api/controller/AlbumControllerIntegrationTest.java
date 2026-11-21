@@ -1,35 +1,26 @@
 
 package lab2_api.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-
 import org.springframework.http.MediaType;
-
 import org.springframework.security.test.context.support.WithMockUser;
-
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,6 +40,8 @@ class AlbumControllerIntegrationTest {
                 .apply(springSecurity())
                 .build();
     }
+
+    // USER and ADMIN can read albums.
 
     @Test
     void shouldGetAllAlbums() throws Exception {
@@ -76,6 +69,9 @@ class AlbumControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+    // Only ADMIN can create albums.
+
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void shouldCreateAlbum() throws Exception {
 
@@ -96,6 +92,9 @@ class AlbumControllerIntegrationTest {
                 .andExpect(jsonPath("$.artistId").value(1));
     }
 
+    // Only ADMIN can update albums.
+
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void shouldUpdateAlbum() throws Exception {
 
@@ -116,6 +115,7 @@ class AlbumControllerIntegrationTest {
                 .andExpect(jsonPath("$.artistId").value(1));
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void shouldReturnNotFoundWhenUpdatingMissingAlbum() throws Exception {
 
@@ -132,10 +132,12 @@ class AlbumControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+    // Only ADMIN can delete albums.
+
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void shouldDeleteAlbum() throws Exception {
 
-        // Create a temporary album first.
         String response = mockMvc.perform(post("/api/albums")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -158,17 +160,59 @@ class AlbumControllerIntegrationTest {
                 .get("albumId")
                 .asInt();
 
-        // Delete the album using a valid CSRF token.
         mockMvc.perform(delete("/api/albums/" + albumId)
                         .with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void shouldReturnNotFoundWhenDeletingMissingAlbum() throws Exception {
 
         mockMvc.perform(delete("/api/albums/999999")
                         .with(csrf()))
                 .andExpect(status().isNotFound());
+    }
+
+    // Security tests: USER cannot modify albums.
+
+    @Test
+    void userCannotCreateAlbum() throws Exception {
+
+        mockMvc.perform(post("/api/albums")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "albumId": null,
+                                    "title": "Unauthorized Album",
+                                    "artistId": 1
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void userCannotUpdateAlbum() throws Exception {
+
+        mockMvc.perform(put("/api/albums/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "albumId": 1,
+                                    "title": "Unauthorized Update",
+                                    "artistId": 1
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void userCannotDeleteAlbum() throws Exception {
+
+        mockMvc.perform(delete("/api/albums/1")
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
     }
 }
