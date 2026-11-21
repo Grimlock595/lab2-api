@@ -15,6 +15,8 @@ public interface UserService {
 
     User save(User user);
 
+    void register(String username, String password, String confirmPassword);
+
     boolean changePassword(Long userId, String currentPassword, String newPassword);
 
 }
