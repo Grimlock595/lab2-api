@@ -1,3 +1,4 @@
+
 package lab2_api.service;
 
 import java.util.List;
@@ -15,8 +16,14 @@ public interface UserService {
 
     User save(User user);
 
+    void resetPassword(Long userId);
+
     void register(String username, String password, String confirmPassword);
 
     boolean changePassword(Long userId, String currentPassword, String newPassword);
 
+    // Administrator management operations
+    void toggleUserEnabled(Long userId);
+
+    void changeUserRole(Long userId, String role);
 }

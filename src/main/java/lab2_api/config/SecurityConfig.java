@@ -29,8 +29,13 @@ public class SecurityConfig {
                     "/favicon.ico"
                 ).permitAll()
                 .requestMatchers(HttpMethod.POST, "/register").permitAll()
+
+                // Only administrators can access user-management routes.
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                // All other nonpublic routes require authentication.
                 .anyRequest().authenticated()
-            )
+                            )
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
